@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {StyleSheet, View, Text, Dimensions, StatusBar, Image, FlatList} from "react-native";
+import { AntDesign } from '@expo/vector-icons'; 
 import {Spinner, 
         Container,
         Header,
@@ -28,38 +29,54 @@ const homeScreen = ({ navigation }) => {
     const [error, setError] = useState(false);
     const [search, setSearch] = useState("");
 
-    const DATA=[
-      {
-        title: "Pizza con cebolla",
-        spoonacularScore: "25",
-        summary: "asdasfasfasufhasffhaosdhaosuhfoaishfoaihodiasdoiasdoasdsfasfas",
-      }
-    ]
+    //Elemento Data de prueba par evitar realizar demaciadas consultas a la API.
+    // const DATA=[
+    //   {
+    //     id: "1",
+    //     title: "Pizza con cebolla",
+    //     spoonacularScore: "25",
+    //     summary: "asdasfasfasufhasffhaosdhaosuhfoaishfoaihodiasdoiasdoasdsfasfas",
+    //   },
 
-    // const getRecipes = async () => {
-    //     try {
-    //       // Consultar la API de TheMovieDB
-    //       const response = await backend.get(`random?apiKey=${apiKey}&number=10`);
-    
-    //       setRecipes(response.data);
-    //     } catch (error) {
-    //       // Error al momento de ejecutar la petición a la API
-    //       setError(true);
-    //     }
-    // }
-    
-    // useEffect(() => {
-    // // Efecto secundario realizar la petición a la API
-    // getRecipes();
-    // }, []);
+    //   {
+    //     id: "2",
+    //     title: "Pizza napolitada",
+    //     spoonacularScore: "45",
+    //     summary: "asdasfasfasufhasffhaosdhaosuhfoaishfoaihodiasdoiasdoasdsfasfas",
+    //   },
 
-    // if (!recipes) {
-    //     return (
-    //       <View style={{flex: 1, justifyContent: "center"}}>
-    //         <Spinner color="red" />
-    //       </View>
-    //     )
-    // }
+    //   {
+    //     id: "3",
+    //     title: "Pizza de pollo",
+    //     spoonacularScore: "50",
+    //     summary: "asdasfasfasufhasffhaosdhaosuhfoaishfoaihodiasdoiasdoasdsfasfas",
+    //   },
+    // ]
+
+    const getRecipes = async () => {
+        try {
+          // Consultar la API de TheMovieDB
+          const response = await backend.get(`random?apiKey=${apiKey}&number=10`);
+          //https://api.spoonacular.com/recipes/random?apiKey=&number=10
+          setRecipes(response.data);
+        } catch (error) {
+          // Error al momento de ejecutar la petición a la API
+          setError(true);
+        }
+    }
+    
+    useEffect(() => {
+    // Efecto secundario realizar la petición a la API
+    getRecipes();
+    }, []);
+
+    if (!recipes) {
+        return (
+          <View style={{flex: 1, justifyContent: "center"}}>
+            <Spinner color="red" />
+          </View>
+        )
+    }
 
     return (
       <Container>
@@ -68,28 +85,28 @@ const homeScreen = ({ navigation }) => {
         </View>
         <Header searchBar>
           <Item style={styles.itemlogo}>
-            <Input placeholder="Buscar" value={search}/>
+            <Input placeholder="Buscar" value={search} onChangeText={setSearch}/>
           </Item>
           <Right style={styles.searchButton}>
-              <Button light icon>
+              <Button light icon onPress={() => {navigation.navigate("recipesSearchScreen", {search})}}>
                 <Icon name="search"></Icon>
               </Button>
             </Right>
       </Header>
       <H3 style={styles.tituloCualquiera}>Titulo cualquiera</H3>
       <FlatList 
-        data={DATA}
-        keyExtractor ={(item) => item.id}
+        data={recipes.recipes}
+        keyExtractor ={item => item.id.toString()}
         ListEmptyComponent={<Text>¡No se han encontrado recetas T_T!</Text>}
         renderItem={({item}) => {
           return(
             <View>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => {navigation.navigate("recipeInfoScreen", {id: item.id})}}>
                 <Card>
                   <View style={styles.mainContainer}>
                     <View style={styles.leftContainer}>
                       <View style={styles.image}>
-                        <Image source={require("../../assets/pizza.png")} style={styles.recipeImage}/> 
+                        <Image source={{uri: `${apiImageUrl}${item.id}-${apiImageSize}.${item.imageType}`}} style={styles.recipeImage}/> 
                       </View>
                     </View>
                     <View style={styles.rightContainer}>
@@ -102,7 +119,7 @@ const homeScreen = ({ navigation }) => {
                       <View style={styles.showDetails}>
                         <H3>Detalles</H3>
                         <Button icon>
-                          <Icon name="search"></Icon>
+                          <Icon><AntDesign name="arrowright" size={24} color="white" /></Icon>
                         </Button>
                       </View>
                     </View>
@@ -173,12 +190,11 @@ const styles = StyleSheet.create({
 
     showDetails:{
       flexDirection: 'row',
-      alignItems: 'flex-end',
+      alignItems: 'center',
       justifyContent: 'flex-end',
     },
 
     description:{
-      borderWidth: 3,
       position: 'absolute',
       backgroundColor: 'grey',
       width: width/1.50,
