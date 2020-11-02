@@ -1,23 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Dimensions } from "react-native";
-import { Content, Text, H1, Spinner, Card } from "native-base";
+import { Image, StyleSheet, Dimensions, View, StatusBar, Text} from "react-native";
+import {Spinner, 
+  Container,
+  Header,
+  Item,
+  Input,
+  Button,
+  Icon,
+  Right,
+  H3,
+  Card,
+  CardItem,
+  Body,
+  H1,
+  H2} from "native-base";
 import backend from "../api/backend";
 import getEnvVars from "../../enviroment";
+import { FlatList } from "react-native-gesture-handler";
 
 const { apiUrl, apiKey, apiImageUrl, apiImageSize } = getEnvVars();
 
 const { width, height } = Dimensions.get("window");
 
-const MovieInfoScreen = ({route, navigation}) => {
+const RecipeInfo = ({route, navigation}) => {
     // Obtener el id de la película
     const { id } = route.params;
     const [recipe, setRecipe] = useState(null);
     const [error, setError] = useState(false);
 
-    const getMovieInfo = async () => { 
+    // Datos temporales para evaluacion
+    
+
+    const getRecipeInfo = async () => { 
         try {
-          const response = await backend.get(`${apiUrl}${id}/information?apikey=${apiKey}`);
-          //https://api.spoonacular.com/recipes/636787/information?apiKey=07e9445ef5134f7d9ab5bbb0ffb089c3
+          const response = await backend.get(`${apiUrl}${id}/information?apiKey=${apiKey}`);
+          //https://api.spoonacular.com/recipes/636787/information?apiKey=
     
           setRecipe(response.data);
         } catch(error) {
@@ -27,7 +44,7 @@ const MovieInfoScreen = ({route, navigation}) => {
 
     // Efecto secundario que ejecuta la consulta a la API
     useEffect(() => {
-        getMovieInfo();
+        getRecipeInfo();
     }, []);
 
     if (!recipe) {
@@ -37,11 +54,56 @@ const MovieInfoScreen = ({route, navigation}) => {
           </View>
         )
     }
+
+
     return (
-        <View style={styles.container}>
-          <Text>Esta es la pantalla de Informacion de al receta</Text>
-          <StatusBar style="auto" />
-        </View>
+        <Container>
+         {/* Logo de la aplicacicon */}
+          <View style={styles.logo}>
+            <Image source={require("../../assets/Logo_Cookius.png")} style={styles.logoApp  }></Image>
+          </View>
+          <View>
+                <H1 style={{textAlign: 'center'}}>{recipe.title}</H1>
+                <Card style={styles.imgaRecipeContainer}>
+                  <Image source={{uri: `${apiImageUrl}${recipe.id}-${apiImageSize}.${recipe.imageType}`}} style={styles.recipeImage}/>
+                </Card>
+                <H3>Descripción</H3>
+                <Card>
+                  <CardItem>
+                    <Body>
+                      <Text>{recipe.summary}</Text>
+                    </Body>
+                  </CardItem>
+                </Card>
+                <H3>Ingredientes</H3>
+                <Card>
+                  <CardItem>
+                    <Body>
+                      {
+                        recipe.extendedIngredients.map((ingredients) => (
+                        <Text key={ingredients.id}>{ingredients.original}</Text>))
+                      }
+                    </Body>
+                  </CardItem>
+                </Card>
+                <H3>Preparación</H3>
+                <Card>
+                  <CardItem>
+                    {/* <Body>
+                      {
+                        recipe.analyzedInstructions.map((preparation) => ( 
+                          preparation.steps.map((step) =>(
+                            <View>
+                              <Text key={step.number}>Paso: {step.step}</Text>
+                            </View>
+                          ))
+                        ))
+                      }
+                    </Body> */}
+                  </CardItem>
+                </Card>
+              </View>
+        </Container>
       );
 }
 
@@ -50,5 +112,22 @@ const styles = StyleSheet.create({
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
-    }
+    },
+
+    logoApp: {
+      width: width,
+      height: height * 0.08,
+      resizeMode: "contain",
+    },
+
+    imgaRecipeContainer:{
+      alignItems: 'center',
+    },
+
+    recipeImage: {
+      width: 128,
+      height: 128,
+    },
 });
+
+export default RecipeInfo;
