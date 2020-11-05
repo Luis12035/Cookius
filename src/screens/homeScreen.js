@@ -18,6 +18,7 @@ import backend from "../api/backend"
 import getEnvVars from "../../enviroment"
 import { color } from "react-native-reanimated";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import HTML from 'react-native-render-html'; // importamos el componente que nos permite renderizar el texto html
 
 const { apiKey, apiImageUrl, apiImageSize } = getEnvVars();
 
@@ -113,7 +114,7 @@ const homeScreen = ({ navigation }) => {
 
                       <H3>{item.title}</H3>
                       <H3>{item.spoonacularScore}</H3>
-                      <View style={{borderWidth: 3, height: 75,}}>
+                      <View style={{height: 190}}>
 
                       </View>
                       <View style={styles.showDetails}>
@@ -124,9 +125,7 @@ const homeScreen = ({ navigation }) => {
                       </View>
                     </View>
                     <View style={styles.description}>
-                        <Text>
-                          {item.summary}
-                        </Text>
+                        <HTML html={item.summary}/>
                     </View>
                   </View>
                 </Card>
@@ -176,6 +175,9 @@ const styles = StyleSheet.create({
     leftContainer:{
       backgroundColor: '#F92626',
       alignItems: 'center',
+      paddingRight: 15,
+      paddingLeft: 15,
+      paddingTop: 15,
       
     },
 
@@ -196,15 +198,21 @@ const styles = StyleSheet.create({
 
     description:{
       position: 'absolute',
-      backgroundColor: 'grey',
+      backgroundColor: 'white',
+      opacity: 0.75,
       width: width/1.50,
-      top: 59,
-      left:25,
+      maxHeight: 120,
+      top: 120,
+      left:50,
+      borderRadius: 15,
+      padding: 10,
+      borderWidth: 0.75,
     },
 
     recipeImage: {
-      width: 128,
-      height: 128,
+      width: 100,
+      height: 100,
+      borderRadius: 15,
     },
   }
 )
