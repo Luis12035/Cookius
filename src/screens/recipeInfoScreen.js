@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Dimensions, View, StatusBar, Text} from "react-native";
+import { Image, StyleSheet, Dimensions, View, StatusBar, Text, ScrollView} from "react-native";
 import {Spinner, 
   Container,
   Header,
@@ -17,10 +17,12 @@ import {Spinner,
 import backend from "../api/backend";
 import getEnvVars from "../../enviroment";
 import { FlatList } from "react-native-gesture-handler";
+import HTML from 'react-native-render-html'; // importamos el componente que nos permite renderizar el texto html
 
 const { apiUrl, apiKey, apiImageUrl, apiImageSize } = getEnvVars();
 
 const { width, height } = Dimensions.get("window");
+let recipes =0;
 
 const RecipeInfo = ({route, navigation}) => {
     // Obtener el id de la película
@@ -62,7 +64,7 @@ const RecipeInfo = ({route, navigation}) => {
           <View style={styles.logo}>
             <Image source={require("../../assets/Logo_Cookius.png")} style={styles.logoApp  }></Image>
           </View>
-          <View>
+          <ScrollView>
                 <H1 style={{textAlign: 'center'}}>{recipe.title}</H1>
                 <Card style={styles.imgaRecipeContainer}>
                   <Image source={{uri: `${apiImageUrl}${recipe.id}-${apiImageSize}.${recipe.imageType}`}} style={styles.recipeImage}/>
@@ -71,7 +73,7 @@ const RecipeInfo = ({route, navigation}) => {
                 <Card>
                   <CardItem>
                     <Body>
-                      <Text>{recipe.summary}</Text>
+                      <HTML html={recipe.summary}/>
                     </Body>
                   </CardItem>
                 </Card>
@@ -89,20 +91,17 @@ const RecipeInfo = ({route, navigation}) => {
                 <H3>Preparación</H3>
                 <Card>
                   <CardItem>
-                    {/* <Body>
+                    <Body>
                       {
-                        recipe.analyzedInstructions.map((preparation) => ( 
-                          preparation.steps.map((step) =>(
-                            <View>
-                              <Text key={step.number}>Paso: {step.step}</Text>
-                            </View>
-                          ))
+                        recipe[`analyzedInstructions`][0][`steps`].map((step) =>(
+                        <Text key={step.number}>Paso {step.number}: {step.step}</Text>
                         ))
+                        
                       }
-                    </Body> */}
+                    </Body>
                   </CardItem>
                 </Card>
-              </View>
+              </ScrollView>
         </Container>
       );
 }
@@ -125,7 +124,7 @@ const styles = StyleSheet.create({
     },
 
     recipeImage: {
-      width: 128,
+      width: width,
       height: 128,
     },
 });
