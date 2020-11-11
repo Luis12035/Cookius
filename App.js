@@ -12,9 +12,9 @@ export default function App() {
   return(
     <NavigationContainer>
       <Stack.Navigator initialRouteName="homeScreen">
-        <Stack.Screen name="homeScreen" component={homeScreen}></Stack.Screen>
-        <Stack.Screen name="recipesSearchScreen" component={recipesSearchScreen}></Stack.Screen>
-        <Stack.Screen name="recipeInfoScreen" component={recipeInfoScreen}></Stack.Screen>
+        <Stack.Screen name="homeScreen" component={homeScreen} options={{headerShown: false}}></Stack.Screen>
+        <Stack.Screen name="recipesSearchScreen" component={recipesSearchScreen} options={{title: ' '}}></Stack.Screen>
+        <Stack.Screen name="recipeInfoScreen" component={recipeInfoScreen} options={{title: ' '}}></Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   )
