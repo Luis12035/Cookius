@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {StyleSheet, View, Text, Dimensions, StatusBar, Image, FlatList} from "react-native";
+import {StyleSheet, View, Text, Dimensions, StatusBar, Image, FlatList, ScrollView} from "react-native";
 import { AntDesign } from '@expo/vector-icons'; 
 import {Spinner, 
         Container,
@@ -29,6 +29,7 @@ const homeScreen = ({ navigation }) => {
     const [recipes, setRecipes] = useState(null);
     const [error, setError] = useState(false);
     const [search, setSearch] = useState("");
+    const [searcError, setSearchError] = useState(false);
 
     //Elemento Data de prueba par evitar realizar demaciadas consultas a la API.
     // const DATA=[
@@ -65,6 +66,15 @@ const homeScreen = ({ navigation }) => {
           setError(true);
         }
     }
+
+    const handlerSearch = () =>{
+      if (!search) {
+        setSearchError(true)
+      }else
+      {
+        navigation.navigate("recipesSearchScreen", {search})
+      }
+    }
     
     useEffect(() => {
     // Efecto secundario realizar la petición a la API
@@ -80,56 +90,54 @@ const homeScreen = ({ navigation }) => {
     }
 
     return (
-      <Container>
+      <Container style={{backgroundColor: '#F5F5F5'}}>
         <View style={styles.logo}>
           <Image source={require("../../assets/Logo_Cookius.png")} style={styles.logoApp  }></Image>
         </View>
-        <Header searchBar>
+        <Header searchBar style={{backgroundColor: '#F5F5F5',}}>
           <Item style={styles.itemlogo}>
             <Input placeholder="Buscar" value={search} onChangeText={setSearch}/>
           </Item>
           <Right style={styles.searchButton}>
-              <Button light icon onPress={() => {navigation.navigate("recipesSearchScreen", {search})}}>
-                <Icon name="search"></Icon>
+              <Button icon transparent onPress={() => handlerSearch}>
+                <Icon><AntDesign name="search1" size={24} color="red" /></Icon>
               </Button>
             </Right>
       </Header>
-      <H3 style={styles.tituloCualquiera}>Titulo cualquiera</H3>
       <FlatList 
         data={recipes.recipes}
         keyExtractor ={item => item.id.toString()}
-        ListEmptyComponent={<Text>¡No se han encontrado recetas T_T!</Text>}
+        ListEmptyComponent={<Text>can't find recipes T_T!</Text>}
         renderItem={({item}) => {
           return(
             <View>
-              <TouchableOpacity onPress={() => {navigation.navigate("recipeInfoScreen", {id: item.id})}}>
-                <Card>
-                  <View style={styles.mainContainer}>
-                    <View style={styles.leftContainer}>
-                      <View style={styles.image}>
-                        <Image source={{uri: `${apiImageUrl}${item.id}-${apiImageSize}.${item.imageType}`}} style={styles.recipeImage}/> 
-                      </View>
-                    </View>
-                    <View style={styles.rightContainer}>
-
-                      <H3>{item.title}</H3>
-                      <H3>{item.spoonacularScore}</H3>
-                      <View style={{height: 190}}>
-
-                      </View>
-                      <View style={styles.showDetails}>
-                        <H3>Detalles</H3>
-                        <Button icon>
-                          <Icon><AntDesign name="arrowright" size={24} color="white" /></Icon>
-                        </Button>
-                      </View>
-                    </View>
-                    <View style={styles.description}>
-                        <HTML html={item.summary}/>
+              <Card transparent style={styles.mainCard}>
+                <View style={styles.mainContainer}>
+                  <View style={styles.leftContainer}>
+                    <View style={styles.image}>
+                      <Image source={{uri: `${apiImageUrl}${item.id}-${apiImageSize}.${item.imageType}`}} style={styles.recipeImage}/> 
                     </View>
                   </View>
-                </Card>
-              </TouchableOpacity>
+                  <View style={styles.rightContainer}>
+
+                    <H3>{item.title}</H3>
+                    <H3>Score: {item.spoonacularScore}</H3>
+                    <View style={{height: height/4.5}}>
+                    </View>
+                    <TouchableOpacity onPress={() => {navigation.navigate("recipeInfoScreen", {id: item.id, imageType: item.imageType})}}>
+                      <View style={styles.showDetails}>
+                        <H3>Details</H3>
+                        <Button icon transparent>
+                          <Icon><AntDesign name="arrowright" size={24} color="red" /></Icon>
+                        </Button>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                  <ScrollView style={styles.description}>
+                    <HTML html={item.summary}/>
+                  </ScrollView>
+                </View>
+              </Card>
             </View>
           )
         }}
@@ -156,10 +164,14 @@ const styles = StyleSheet.create({
 
     itemlogo:{
       flex: 1,
+      borderRadius: 35,
+      paddingLeft: 10,
     },
 
     searchButton:{
       flex: 0.19,
+      borderRadius: 15,
+      color: 'red',
     },
 
     logo:{
@@ -170,6 +182,8 @@ const styles = StyleSheet.create({
     mainContainer:{
       flexDirection: 'row',
       flex: 1,
+      borderRadius: 15,
+      backgroundColor: 'white',
     },
 
     leftContainer:{
@@ -178,7 +192,8 @@ const styles = StyleSheet.create({
       paddingRight: 15,
       paddingLeft: 15,
       paddingTop: 15,
-      
+      borderBottomLeftRadius:15,
+      borderTopLeftRadius: 15,
     },
 
     image:{
@@ -199,9 +214,8 @@ const styles = StyleSheet.create({
     description:{
       position: 'absolute',
       backgroundColor: 'white',
-      opacity: 0.75,
       width: width/1.50,
-      maxHeight: 120,
+      height: height /6,
       top: 120,
       left:50,
       borderRadius: 15,
@@ -213,7 +227,15 @@ const styles = StyleSheet.create({
       width: 100,
       height: 100,
       borderRadius: 15,
+      borderColor: 'white',
+      borderWidth: 3,
     },
+
+    mainCard:{
+      marginLeft: 10,
+      marginRight: 10,
+      marginTop: 20,
+    }
   }
 )
 
