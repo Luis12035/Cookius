@@ -77,19 +77,18 @@ const RecipeSearch = ({ route, navigation }) => {
 
 
     return (
-        <Container>
+        <Container style={{backgroundColor: '#F5F5F5'}}>
           {/* Logo de la aplicacion */}
           <View style={styles.logo}>
           <Image source={require("../../assets/Logo_Cookius.png")} style={styles.logoApp  }></Image>
           </View>
-          <H3 style={styles.tituloCualquiera}>Resultados de la busqueda</H3>
           <FlatList
           data={recipes.results}
           keyExtractor={item => item.id.toString()}
           renderItem={({item}) =>{
             return(
               <View>
-                <TouchableOpacity onPress={() => {navigation.navigate("recipeInfoScreen", {id: item.id})}}>
+                <TouchableOpacity onPress={() => {navigation.navigate("recipeInfoScreen", {id: item.id, imageType: item.imageType})}}>
                   <Card>
                     <View style={styles.mainContainer}>
                     <View style={styles.leftContainer}>
@@ -104,7 +103,7 @@ const RecipeSearch = ({ route, navigation }) => {
                         {/* Quitamos spoonacularScore */}
                       <CardItem footer style={styles.cardfooter}>
                         <View style={styles.showDetails}>
-                            <H3>Detalles</H3>
+                            <H3>Details</H3>
                             <Button icon>
                               <Icon><AntDesign name="arrowright" size={24} color="white" /></Icon>
                             </Button>
@@ -158,11 +157,6 @@ const styles = StyleSheet.create({
     cardheader:{
       height: 40,
     },
-    
-    cardbody:{
- 
-      height: 40,
-    },
 
     cardfooter:{
       height: 50,
@@ -176,8 +170,8 @@ const styles = StyleSheet.create({
     },
 
     recipeImage: {
-      width: 128,
-      height: 128,
+      width: 100,
+      height: 100,
     },
 });
 
