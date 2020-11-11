@@ -26,7 +26,7 @@ let recipes =0;
 
 const RecipeInfo = ({route, navigation}) => {
     // Obtener el id de la película
-    const { id } = route.params;
+    const { id, imageType } = route.params;
     const [recipe, setRecipe] = useState(null);
     const [error, setError] = useState(false);
 
@@ -59,59 +59,45 @@ const RecipeInfo = ({route, navigation}) => {
 
 
     return (
-        <Container>
+        <Container style={{backgroundColor: '#F5F5F5'}}>
          {/* Logo de la aplicacicon */}
           <View style={styles.logo}>
             <Image source={require("../../assets/Logo_Cookius.png")} style={styles.logoApp  }></Image>
           </View>
           <ScrollView>
                 <H1 style={{textAlign: 'center'}}>{recipe.title}</H1>
-                <Card style={styles.imgaRecipeContainer}>
-                  <Image source={{uri: `${apiImageUrl}${recipe.id}-${apiImageSize}.${recipe.imageType}`}} style={styles.recipeImage}/>
+                <Card transparent style={styles.imgaRecipeContainer}>
+                  <Image source={{uri: `${apiImageUrl}${recipe.id}-${apiImageSize}.${imageType}`}} style={styles.recipeImage}/>
                 </Card>
-                <H3>Descripción</H3>
-                <Card>
-                  <CardItem>
-                    <Body>
-                      <HTML html={recipe.summary}/>
-                    </Body>
-                  </CardItem>
-                </Card>
-                <H3>Ingredientes</H3>
-                <Card>
-                  <CardItem>
-                    <Body>
-                      {
-                        recipe.extendedIngredients.map((ingredients) => (
-                        <Text key={ingredients.id}>{ingredients.original}</Text>))
-                      }
-                    </Body>
-                  </CardItem>
-                </Card>
-                <H3>Preparación</H3>
-                <Card>
-                  <CardItem>
-                    <Body>
-                      {
-                        recipe[`analyzedInstructions`][0][`steps`].map((step) =>(
-                        <Text key={step.number}>Paso {step.number}: {step.step}</Text>
-                        ))
-                        
-                      }
-                    </Body>
-                  </CardItem>
-                </Card>
+                <H2>Description</H2>
+                <View style={styles.infoRecipe}>
+                  <HTML html={recipe.summary}/>
+                </View>
+                <H2>Ingredients</H2>
+                <View style={styles.infoRecipe}>
+                  {
+                    recipe.extendedIngredients.map((ingredients, index) => (
+                      <Text key={index}>{ingredients.original}</Text>))
+                  } 
+                </View>
+                <H2>Preparation steps</H2>
+                <View style={styles.infoRecipe}>
+                  {
+                    recipe[`analyzedInstructions`][0][`steps`].map((step, index) =>(
+                      <Text key={index}>Step {index + 1}: {step.step}</Text>))    
+                  } 
+                </View>
               </ScrollView>
         </Container>
       );
 }
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-    },
+    // container: {
+    //   flex: 1,
+    //   justifyContent: "center",
+    //   alignItems: "center",
+    // },
 
     logoApp: {
       width: width,
@@ -121,12 +107,33 @@ const styles = StyleSheet.create({
 
     imgaRecipeContainer:{
       alignItems: 'center',
+      marginLeft: 15,
+      marginRight: 15,
     },
 
     recipeImage: {
-      width: width,
-      height: 128,
+      width: width/1.1,
+      height: height/4,
+      borderRadius: 15,
     },
+
+    infoRecipe:{
+      marginBottom: 15,
+      marginLeft: 25,
+      marginRight: 25,
+      padding: 15,
+      //borderRadius: 15,
+      // borderWidth: 0.25,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 12,
+      },
+      shadowOpacity: 0.58,
+      shadowRadius: 5.00,
+
+      elevation: 3,
+    }
 });
 
 export default RecipeInfo;
