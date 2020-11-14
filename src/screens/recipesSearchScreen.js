@@ -1,20 +1,13 @@
 import React, {useEffect, useState} from "react"
-import { StyleSheet, View, Text, Dimensions, Image, StatusBar} from "react-native";
+import { StyleSheet, View, Dimensions, Image, SafeAreaView, ScrollView} from "react-native";
 import { AntDesign } from '@expo/vector-icons'; 
 import {Spinner, 
   Container,
-  Header,
-  Item,
-  Input,
   Button,
   Icon,
-  Right,
   H3,
-  Card,
-  CardItem,
-  Body,
-  H1,
-  H2} from "native-base";
+  Card
+} from "native-base";
 import backend from "../api/backend";
 import getEnvVars from "../../enviroment";
 import {FlatList, TouchableOpacity} from "react-native-gesture-handler";
@@ -62,11 +55,12 @@ const RecipeSearch = ({ route, navigation }) => {
           setError(true);
         }
     }
-
+    //ejecto secuntario al consultar la api
     useEffect(() => {
         getSearchRecipes();
     }, []);
 
+    //mostramos un spiner mientras se ejecuta el hook de efecto
     if (!recipes) {
         return (
           <View style={{flex: 1, justifyContent: "center"}}>
@@ -75,9 +69,9 @@ const RecipeSearch = ({ route, navigation }) => {
         )
     }
 
-
+    //se diseña la pantalla a retornar
     return (
-        <Container style={{backgroundColor: '#F5F5F5'}}>
+        <Container style={{backgroundColor: '#DBDBDB'}}>
           {/* Logo de la aplicacion */}
           <View style={styles.logo}>
           <Image source={require("../../assets/Logo_Cookius.png")} style={styles.logoApp  }></Image>
@@ -89,28 +83,30 @@ const RecipeSearch = ({ route, navigation }) => {
             return(
               <View>
                 <TouchableOpacity onPress={() => {navigation.navigate("recipeInfoScreen", {id: item.id, imageType: item.imageType})}}>
-                  <Card>
+                  <Card style={{borderRadius: 15}}>
                     <View style={styles.mainContainer}>
-                    <View style={styles.leftContainer}>
-                      <View style={styles.image}>
-                        <Image source={{uri: `${apiImageUrl}${item.id}-${apiImageSize}.${item.imageType}`}} style={styles.recipeImage}/>
+                      <View style={styles.leftContainer}>
+                        <View style={styles.image}>
+                          <Image source={
+                            item.image ?
+                            ({ uri: `${apiImageUrl}${item.id}-${apiImageSize}.${item.imageType}` })
+                            : require("../../assets/pizza.png")} style={styles.recipeImage}/>
+                        </View>
+                      </View>
+                      <View style={styles.rightContainer}>
+                        <SafeAreaView style={{flex:1}}>
+                        <ScrollView style={styles.cardheader} contentContainerStyle={{flex: 1}} horizontal={true}>
+                          <H3>{item.title}</H3>
+                        </ScrollView>
+                        </SafeAreaView>
+                        <View style={styles.showDetails}>
+                          <H3>Details</H3>
+                          <Button icon transparent>
+                            <Icon><AntDesign name="arrowright" size={24} color="red" /></Icon>
+                          </Button>
+                        </View>
                       </View>
                     </View>
-                    <Card transparent style={styles.rightContainer}>
-                      <CardItem header style={styles.cardheader}>
-                        <H2>{item.title}</H2>
-                      </CardItem>
-                        {/* Quitamos spoonacularScore */}
-                      <CardItem footer style={styles.cardfooter}>
-                        <View style={styles.showDetails}>
-                            <H3>Details</H3>
-                            <Button icon>
-                              <Icon><AntDesign name="arrowright" size={24} color="white" /></Icon>
-                            </Button>
-                          </View>
-                      </CardItem>
-                    </Card>
-                  </View>
                   </Card>
                 </TouchableOpacity>
               </View>
@@ -119,9 +115,10 @@ const RecipeSearch = ({ route, navigation }) => {
 
           </FlatList>
       </Container>
-      );
+    );
 }
 
+///se crean los estilos a utilizar
 const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -131,48 +128,68 @@ const styles = StyleSheet.create({
 
     logoApp: {
       width: width,
-      height: height * 0.08,
+      height: height * 0.06,
       resizeMode: "contain",
+      marginTop: 30
     },
 
     mainContainer:{
       flexDirection: 'row',
       flex: 1,
+      height: height * 0.20,
+      borderRadius: 15,
+    },
+
+    logo:{
+      borderBottomLeftRadius: 15,
+      borderBottomRightRadius: 15,
+      backgroundColor: 'white',
+      paddingBottom: 5,
+      marginBottom: 5
     },
 
     leftContainer:{
       backgroundColor: '#F92626',
       alignItems: 'center',
-      
+      paddingRight: 15,
+      paddingLeft: 15,
+      paddingTop: 15,
+      borderBottomLeftRadius:15,
+      borderTopLeftRadius: 15,
     },
 
-    image:{
-      borderRadius: 15,
-    },
 
     rightContainer:{
-      flex: 3,
+      flex: 1,
+      paddingLeft:10,
+      paddingTop:10,
+      paddingRight:10
     },
 
     cardheader:{
-      height: 40,
+      flex: 1,
     },
 
     cardfooter:{
-      height: 50,
-    },
+      alignSelf: "flex-end"
+    }, 
 
     showDetails:{
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'flex-end',
-      flex: 1,
+      borderTopColor: 'red',
+      borderTopWidth: 1,
     },
 
     recipeImage: {
-      width: 100,
-      height: 100,
-    },
+        width: 100,
+        height: 100,
+        borderRadius: 15,
+        borderColor: 'white',
+        borderWidth: 3,
+      },
+  
 });
 
 export default RecipeSearch;
