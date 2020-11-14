@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {StyleSheet, View, Text, Dimensions, StatusBar, Image, FlatList, ScrollView} from "react-native";
+import {StyleSheet, View, Text, Dimensions, Image, FlatList, ScrollView, SafeAreaView} from "react-native";
 import { AntDesign } from '@expo/vector-icons'; 
 import {Spinner, 
-        Container,
         Header,
         Item,
         Input,
@@ -10,13 +9,10 @@ import {Spinner,
         Icon,
         Right,
         H3,
-        Card,
-        CardItem,
-        Body,
-        H1} from "native-base";
+        Card
+      } from "native-base";
 import backend from "../api/backend"
 import getEnvVars from "../../enviroment"
-import { color } from "react-native-reanimated";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import HTML from 'react-native-render-html'; // importamos el componente que nos permite renderizar el texto html
 
@@ -57,7 +53,7 @@ const homeScreen = ({ navigation }) => {
 
     const getRecipes = async () => {
         try {
-          // Consultar la API de TheMovieDB
+          // Consultar la API
           const response = await backend.get(`random?apiKey=${apiKey}&number=10`);
           //https://api.spoonacular.com/recipes/random?apiKey=&number=10
           setRecipes(response.data);
@@ -65,46 +61,52 @@ const homeScreen = ({ navigation }) => {
           // Error al momento de ejecutar la petición a la API
           setError(true);
         }
-    }
+    };
 
+    //Función encargada de limpiar las busquedas al momento de regresar a la pantalla de inicio
     const handlerSearch = () =>{
       if (!search) {
         setSearchError(true)
       }else
       {
         navigation.navigate("recipesSearchScreen", {search})
+        setSearch("");
+        setSearchError(false);
       }
-    }
+    };
     
     useEffect(() => {
     // Efecto secundario realizar la petición a la API
     getRecipes();
     }, []);
 
+    //mostramos un spiner mientras se ejecuta el hook de efecto
     if (!recipes) {
         return (
           <View style={{flex: 1, justifyContent: "center"}}>
             <Spinner color="red" />
           </View>
         )
-    }
+    };
 
+    //se diseña la pantalla a retornar
     return (
-      <Container style={{backgroundColor: '#F5F5F5'}}>
+      <View style={{backgroundColor: '#DBDBDB'}}>
         <View style={styles.logo}>
           <Image source={require("../../assets/Logo_Cookius.png")} style={styles.logoApp  }></Image>
         </View>
-        <Header searchBar style={{backgroundColor: '#F5F5F5',}}>
+        <Header searchBar transparent androidStatusBarColor='#F92626' style={styles.headerStyle}>
           <Item style={styles.itemlogo}>
             <Input placeholder="Buscar" value={search} onChangeText={setSearch}/>
           </Item>
           <Right style={styles.searchButton}>
-              <Button icon transparent onPress={() => handlerSearch}>
+              <Button icon transparent onPress={() => handlerSearch()}>
                 <Icon><AntDesign name="search1" size={24} color="red" /></Icon>
               </Button>
             </Right>
       </Header>
-      <FlatList 
+      <FlatList
+        style={styles.flatList}
         data={recipes.recipes}
         keyExtractor ={item => item.id.toString()}
         ListEmptyComponent={<Text>can't find recipes T_T!</Text>}
@@ -115,15 +117,24 @@ const homeScreen = ({ navigation }) => {
                 <View style={styles.mainContainer}>
                   <View style={styles.leftContainer}>
                     <View style={styles.image}>
-                      <Image source={{uri: `${apiImageUrl}${item.id}-${apiImageSize}.${item.imageType}`}} style={styles.recipeImage}/> 
+                      <Image source={
+                        item.image ?
+                        ({ uri: `${apiImageUrl}${item.id}-${apiImageSize}.${item.imageType}`})
+                        : require("../../assets/pizza.png")
+                      }
+                      style={styles.recipeImage}/>
                     </View>
                   </View>
                   <View style={styles.rightContainer}>
-
-                    <H3>{item.title}</H3>
-                    <H3>Score: {item.spoonacularScore}</H3>
-                    <View style={{height: height/4.5}}>
+                    <View style={styles.titleContainer}>
+                      <Text style={styles.titleContainer} >{item.title}</Text>
                     </View>
+                    <H3>Score: {item.spoonacularScore}</H3>
+                    <SafeAreaView style={{flex:1}}>
+                    <ScrollView style={styles.description} contentContainerStyle={{flex: 1}} horizontal={true} >
+                      <HTML html={item.summary}/>
+                    </ScrollView>
+                    </SafeAreaView>
                     <TouchableOpacity onPress={() => {navigation.navigate("recipeInfoScreen", {id: item.id, imageType: item.imageType})}}>
                       <View style={styles.showDetails}>
                         <H3>Details</H3>
@@ -133,21 +144,19 @@ const homeScreen = ({ navigation }) => {
                       </View>
                     </TouchableOpacity>
                   </View>
-                  <ScrollView style={styles.description}>
-                    <HTML html={item.summary}/>
-                  </ScrollView>
                 </View>
               </Card>
             </View>
           )
         }}
       />
-      </Container>
+      </View>
       );
 
     
 };
 
+///se crean los estilos a utilizar
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -160,6 +169,7 @@ const styles = StyleSheet.create({
       width: width,
       height: height * 0.08,
       resizeMode: "contain",
+      marginTop: 30
     },
 
     itemlogo:{
@@ -177,6 +187,7 @@ const styles = StyleSheet.create({
     logo:{
       borderBottomLeftRadius: 15,
       borderBottomRightRadius: 15,
+      backgroundColor: 'white',
     },
 
     mainContainer:{
@@ -212,15 +223,14 @@ const styles = StyleSheet.create({
     },
 
     description:{
-      position: 'absolute',
+      zIndex: 1,
       backgroundColor: 'white',
-      width: width/1.50,
+      width: width/1.20,
       height: height /6,
-      top: 120,
-      left:50,
       borderRadius: 15,
       padding: 10,
       borderWidth: 0.75,
+      marginLeft: -120,
     },
 
     recipeImage: {
@@ -235,7 +245,27 @@ const styles = StyleSheet.create({
       marginLeft: 10,
       marginRight: 10,
       marginTop: 20,
-    }
+    },
+    
+    titleContainer: {
+      height: 100,
+      fontSize: 17,
+      flex: 1,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    },
+    headerStyle:{
+      backgroundColor: '#DBDBDB',
+      height: height / 15,
+      borderWidth: 0.23,
+      borderColor: "black"
+    },
+    flatList: {
+      height: height / 1.28,
+      marginTop: 15,
+      zIndex:2
+    },
+
   }
 )
 
