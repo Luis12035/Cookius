@@ -8,7 +8,6 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
-assets/pizza.png
 
 # macOS
 .DS_Store
