@@ -97,7 +97,7 @@ const homeScreen = ({ navigation }) => {
         </View>
         <Header searchBar transparent androidStatusBarColor='#F92626' style={styles.headerStyle}>
           <Item style={styles.itemlogo}>
-            <Input placeholder="Buscar" value={search} onChangeText={setSearch}/>
+            <Input placeholder="Search" value={search} onChangeText={setSearch}/>
           </Item>
           <Right style={styles.searchButton}>
               <Button icon transparent onPress={() => handlerSearch()}>
